@@ -24,7 +24,7 @@ services:
     volumes:
       - opencloud-config:/etc/opencloud
       - ./dev/docker/opencloud/apps.yaml:/etc/opencloud/apps.yaml
-      - ./dist:/web/apps/skeleton
+      - ./dist:/web/apps/betteradmin
     depends_on:
       - traefik
 
