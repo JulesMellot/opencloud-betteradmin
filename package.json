@@ -1,6 +1,6 @@
 {
   "name": "web-app-betteradmin",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A native OpenCloud extension providing administrators with clearer storage insights.",
   "license": "Apache-2.0",
   "author": "BetterAdmin contributors",

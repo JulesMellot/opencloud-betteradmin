@@ -50,7 +50,58 @@ export const loadPreservingPrevious = async <T>(previous: T, loader: () => Promi
   }
 }
 
-const loadUsers = async (clientService: ClientService, force: boolean) => {
+export const attachPersonalDrives = (listedUsers: User[], personalDrives: SpaceResource[]) => {
+  const drivesByOwner = new Map(
+    personalDrives
+      .filter((drive) => drive.owner?.id)
+      .map((drive) => [drive.owner!.id!, drive] as const)
+  )
+
+  return listedUsers.map((user) => {
+    if (user.drive?.quota || !user.id) return user
+
+    const personalDrive = drivesByOwner.get(user.id)
+    if (!personalDrive) return user
+
+    return {
+      ...user,
+      drive: {
+        id: personalDrive.id,
+        name: personalDrive.name || user.displayName,
+        driveType: personalDrive.driveType,
+        owner: { user: personalDrive.owner },
+        quota: personalDrive.spaceQuota
+      }
+    }
+  })
+}
+
+const listUsersWithPersonalDrives = async (
+  clientService: ClientService,
+  includePersonalDrives: boolean
+) => {
+  const listedUsers = await clientService.graphAuthenticated.users.listUsers({
+    orderBy: ['displayName'],
+    expand: ['drive']
+  })
+
+  if (!includePersonalDrives) return listedUsers
+
+  try {
+    const personalDrives = await clientService.graphAuthenticated.drives.listAllDrives({
+      filter: 'driveType eq personal'
+    })
+    return attachPersonalDrives(listedUsers, personalDrives)
+  } catch {
+    return listedUsers
+  }
+}
+
+const loadUsers = async (
+  clientService: ClientService,
+  force: boolean,
+  includePersonalDrives: boolean
+) => {
   if (usersRequest) return await usersRequest
   if (usersLoaded.value && !usersError.value && !force) return
 
@@ -58,10 +109,7 @@ const loadUsers = async (clientService: ClientService, force: boolean) => {
   usersError.value = false
   usersRequest = (async () => {
     const result = await loadPreservingPrevious(users.value, () =>
-      clientService.graphAuthenticated.users.listUsers({
-        orderBy: ['displayName'],
-        expand: ['drive']
-      })
+      listUsersWithPersonalDrives(clientService, includePersonalDrives)
     )
     users.value = result.data
     usersError.value = result.failed
@@ -119,7 +167,9 @@ export const useAdminData = () => {
     const { users: includeUsers = false, spaces: includeSpaces = false, force = false } = options
     const tasks: Promise<void>[] = []
 
-    if (includeUsers && canReadUsers.value) tasks.push(loadUsers(clientService, force))
+    if (includeUsers && canReadUsers.value) {
+      tasks.push(loadUsers(clientService, force, canReadSpaces.value))
+    }
     if (includeSpaces && canReadSpaces.value) tasks.push(loadSpaces(clientService, force))
 
     await Promise.allSettled(tasks)

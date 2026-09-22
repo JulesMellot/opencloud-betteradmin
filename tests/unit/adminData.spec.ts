@@ -1,10 +1,12 @@
 import {
   aggregateQuotas,
+  attachPersonalDrives,
   isQuotaAtRisk,
   loadPreservingPrevious,
   quotaPercentage,
   quotaRatio
 } from '../../src/composables/useAdminData'
+import type { SpaceResource } from '@opencloud-eu/web-client'
 
 describe('BetterAdmin quota helpers', () => {
   it('calculates a quota percentage', () => {
@@ -48,5 +50,26 @@ describe('BetterAdmin quota helpers', () => {
     })
 
     expect(result).toEqual({ data: previous, failed: true })
+  })
+
+  it('attaches explicitly listed personal drives to their users', () => {
+    const result = attachPersonalDrives(
+      [{ id: 'user-1', displayName: 'Ada Lovelace', onPremisesSamAccountName: 'ada' }],
+      [
+        {
+          id: 'drive-1',
+          name: 'Ada Lovelace',
+          driveType: 'personal',
+          owner: { id: 'user-1', displayName: 'Ada Lovelace' },
+          spaceQuota: { used: 512, total: 1024, state: 'normal' }
+        } as SpaceResource
+      ]
+    )
+
+    expect(result[0].drive).toMatchObject({
+      id: 'drive-1',
+      driveType: 'personal',
+      quota: { used: 512, total: 1024, state: 'normal' }
+    })
   })
 })

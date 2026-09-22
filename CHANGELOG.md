@@ -2,6 +2,13 @@
 
 All notable changes to BetterAdmin are documented in this file.
 
+## 0.1.4 - 2026-09-22
+
+### Fixed
+
+- Load personal drives explicitly and associate them with users by owner ID when `$expand=drive` omits them.
+- Keep the user list available if personal-drive enrichment is not permitted by the server.
+
 ## 0.1.3 - 2026-09-22
 
 ### Fixed
