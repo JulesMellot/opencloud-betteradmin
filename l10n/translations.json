@@ -11,7 +11,22 @@
     "Storage used": "Stockage utilisé",
     "%{percent}% of known quotas": "%{percent} % des quotas connus",
     "No finite quota configured": "Aucun quota limité configuré",
-    "%{count} near their quota": "%{count} proche(s) du quota",
+    "%{count} user near the quota": [
+      "%{count} utilisateur proche du quota",
+      "%{count} utilisateurs proches de leur quota"
+    ],
+    "%{count} users near their quota": [
+      "%{count} utilisateur proche du quota",
+      "%{count} utilisateurs proches de leur quota"
+    ],
+    "%{count} space near the quota": [
+      "%{count} espace proche du quota",
+      "%{count} espaces proches de leur quota"
+    ],
+    "%{count} spaces near their quota": [
+      "%{count} espace proche du quota",
+      "%{count} espaces proches de leur quota"
+    ],
     "Attention required": "Attention requise",
     "Resources reported near or above quota": "Ressources signalées proches ou au-dessus du quota",
     "Storage pressure": "Pression sur le stockage",
@@ -21,6 +36,7 @@
     "Refresh": "Actualiser",
     "Refresh data": "Actualiser les données",
     "Unable to load data": "Impossible de charger les données",
+    "Some data could not be refreshed. Previously loaded data is shown.": "Certaines données n’ont pas pu être actualisées. Les données précédemment chargées restent affichées.",
     "Compare personal storage consumption and identify accounts near their quota.": "Comparez la consommation personnelle et identifiez les comptes proches de leur quota.",
     "Monitor project spaces and spot capacity problems early.": "Surveillez les espaces projet et anticipez les problèmes de capacité.",
     "Search": "Rechercher",
@@ -28,6 +44,16 @@
     "Search for spaces": "Rechercher des espaces",
     "No users found": "Aucun utilisateur trouvé",
     "No spaces found": "Aucun espace trouvé",
+    "%{count} user in total": [
+      "%{count} utilisateur au total",
+      "%{count} utilisateurs au total"
+    ],
+    "%{count} users in total": [
+      "%{count} utilisateur au total",
+      "%{count} utilisateurs au total"
+    ],
+    "%{count} space in total": ["%{count} espace au total", "%{count} espaces au total"],
+    "%{count} spaces in total": ["%{count} espace au total", "%{count} espaces au total"],
     "Try refining the search term to get results": "Essayez d’affiner la recherche pour obtenir des résultats",
     "Avatar": "Avatar",
     "Icon": "Icône",

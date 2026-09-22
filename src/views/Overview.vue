@@ -3,15 +3,15 @@
     :title="$gettext('BetterAdmin overview')"
     :description="$gettext('A clear view of storage usage across your OpenCloud instance.')"
     :loading="loading"
-    @refresh="load"
+    @refresh="refresh"
   >
     <app-loading-spinner v-if="loading && !users.length && !spaces.length" />
-    <no-content-message v-else-if="error" icon="error-warning" icon-fill-type="line">
+    <no-content-message v-else-if="hasError && !hasData" icon="error-warning" icon-fill-type="line">
       <template #message><span v-text="$gettext('Unable to load data')" /></template>
-      <template #callToAction><span v-text="error" /></template>
     </no-content-message>
 
     <template v-else>
+      <data-load-warning v-if="hasError" />
       <div class="ext:grid ext:grid-cols-1 ext:gap-4 ext:sm:grid-cols-2 ext:xl:grid-cols-4">
         <metric-card
           :label="$gettext('Storage used')"
@@ -24,16 +24,18 @@
           "
         />
         <metric-card
+          v-if="canReadUsers"
           :label="$gettext('Users')"
           :value="users.length.toString()"
           icon="user"
-          :hint="$gettext('%{count} near their quota', { count: accountsAtRisk })"
+          :hint="userQuotaHint"
         />
         <metric-card
+          v-if="canReadSpaces"
           :label="$gettext('Spaces')"
           :value="spaces.length.toString()"
           icon="layout-grid"
-          :hint="$gettext('%{count} near their quota', { count: spacesAtRisk })"
+          :hint="spaceQuotaHint"
         />
         <metric-card
           :label="$gettext('Attention required')"
@@ -101,15 +103,59 @@ import { OcIcon } from '@opencloud-eu/design-system/components'
 import { computed, onMounted, unref } from 'vue'
 import { useGettext } from 'vue3-gettext'
 import AppLayout from '../components/AppLayout.vue'
+import DataLoadWarning from '../components/DataLoadWarning.vue'
 import MetricCard from '../components/MetricCard.vue'
 import QuotaBar from '../components/QuotaBar.vue'
-import { isQuotaAtRisk, quotaPercentage, useAdminData } from '../composables/useAdminData'
+import {
+  isQuotaAtRisk,
+  quotaPercentage,
+  quotaRatio,
+  useAdminData
+} from '../composables/useAdminData'
 
 defineOptions({ name: 'BetterAdminOverview' })
 
-const { current: currentLanguage, $gettext } = useGettext()
-const { users, spaces, loading, error, totalUsed, totalQuota, accountsAtRisk, spacesAtRisk, load } =
-  useAdminData()
+const { current: currentLanguage, $gettext, $ngettext } = useGettext()
+const {
+  users,
+  spaces,
+  usersLoading,
+  spacesLoading,
+  usersError,
+  spacesError,
+  canReadUsers,
+  canReadSpaces,
+  totalUsed,
+  knownQuotaUsed,
+  totalQuota,
+  accountsAtRisk,
+  spacesAtRisk,
+  load
+} = useAdminData()
+
+const loading = computed(
+  () => (canReadUsers.value && usersLoading.value) || (canReadSpaces.value && spacesLoading.value)
+)
+const hasError = computed(
+  () => (canReadUsers.value && usersError.value) || (canReadSpaces.value && spacesError.value)
+)
+const hasData = computed(() => users.value.length > 0 || spaces.value.length > 0)
+const userQuotaHint = computed(() =>
+  $ngettext(
+    '%{count} user near the quota',
+    '%{count} users near their quota',
+    accountsAtRisk.value,
+    { count: accountsAtRisk.value.toString() }
+  )
+)
+const spaceQuotaHint = computed(() =>
+  $ngettext(
+    '%{count} space near the quota',
+    '%{count} spaces near their quota',
+    spacesAtRisk.value,
+    { count: spacesAtRisk.value.toString() }
+  )
+)
 
 const formatBytes = (bytes: number) => formatFileSize(bytes, currentLanguage)
 const formatUsage = (used: number, total: number) =>
@@ -117,10 +163,10 @@ const formatUsage = (used: number, total: number) =>
     ? `${formatBytes(used)} / ${formatBytes(total)}`
     : `${formatBytes(used)} / ${$gettext('Unrestricted')}`
 
-const globalPercentage = computed(() => quotaPercentage(unref(totalUsed), unref(totalQuota)))
+const globalPercentage = computed(() => quotaPercentage(unref(knownQuotaUsed), unref(totalQuota)))
 const atRiskResources = computed(() =>
   [
-    ...unref(users)
+    ...(canReadUsers.value ? unref(users) : [])
       .filter((user) => isQuotaAtRisk(user.drive?.quota?.state))
       .map((user) => ({
         id: `user-${user.id}`,
@@ -130,7 +176,7 @@ const atRiskResources = computed(() =>
         total: user.drive?.quota?.total || 0,
         quota: user.drive?.quota
       })),
-    ...unref(spaces)
+    ...(canReadSpaces.value ? unref(spaces) : [])
       .filter((space) => isQuotaAtRisk(space.spaceQuota?.state))
       .map((space) => ({
         id: `space-${space.id}`,
@@ -140,8 +186,9 @@ const atRiskResources = computed(() =>
         total: space.spaceQuota?.total || 0,
         quota: space.spaceQuota
       }))
-  ].sort((a, b) => quotaPercentage(b.used, b.total) - quotaPercentage(a.used, a.total))
+  ].sort((a, b) => quotaRatio(b.used, b.total) - quotaRatio(a.used, a.total))
 )
 
-onMounted(load)
+const refresh = () => load({ users: true, spaces: true, force: true })
+onMounted(() => load({ users: true, spaces: true }))
 </script>

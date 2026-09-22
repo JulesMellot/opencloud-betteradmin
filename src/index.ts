@@ -27,11 +27,17 @@ export default defineWebApplication({
     }
 
     const routes: NonNullable<ClassicApplicationScript['routes']> = ({ $ability }) => {
-      const guard: RouteRecordRaw['beforeEnter'] = (_to, _from, next) => {
+      const requireAnyAdminPermission: RouteRecordRaw['beforeEnter'] = (_to, _from, next) => {
         if (!$ability.can('read-all', 'Account') && !$ability.can('read-all', 'Drive')) {
           return next({ path: '/' })
         }
         next()
+      }
+      const requirePermission = (subject: 'Account' | 'Drive'): RouteRecordRaw['beforeEnter'] => {
+        return (_to, _from, next) => {
+          if (!$ability.can('read-all', subject)) return next({ path: `/${APP_ID}/overview` })
+          next()
+        }
       }
 
       const appRoutes: RouteRecordRaw[] = [
@@ -40,21 +46,21 @@ export default defineWebApplication({
           path: '/overview',
           name: 'betteradmin-overview',
           component: () => import('./views/Overview.vue'),
-          beforeEnter: guard,
+          beforeEnter: requireAnyAdminPermission,
           meta: { authContext: 'user', title: $gettext('Overview') }
         },
         {
           path: '/users',
           name: 'betteradmin-users',
           component: () => import('./views/Users.vue'),
-          beforeEnter: guard,
+          beforeEnter: requirePermission('Account'),
           meta: { authContext: 'user', title: $gettext('Storage by user') }
         },
         {
           path: '/spaces',
           name: 'betteradmin-spaces',
           component: () => import('./views/Spaces.vue'),
-          beforeEnter: guard,
+          beforeEnter: requirePermission('Drive'),
           meta: { authContext: 'user', title: $gettext('Storage by space') }
         }
       ]

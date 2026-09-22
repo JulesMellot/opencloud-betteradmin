@@ -1,5 +1,5 @@
 <template>
-  <main class="app-content ext:flex ext:size-full ext:rounded-l-xl ext:overflow-hidden">
+  <main class="ext:flex ext:size-full ext:rounded-l-xl ext:overflow-hidden">
     <div
       class="ext:relative ext:flex ext:min-w-0 ext:flex-1 ext:flex-col ext:overflow-y-auto ext:bg-role-surface"
     >
@@ -36,7 +36,6 @@
 
 <script setup lang="ts">
 import { OcButton, OcIcon } from '@opencloud-eu/design-system/components'
-import { useGettext } from 'vue3-gettext'
 
 withDefaults(
   defineProps<{
@@ -49,5 +48,4 @@ withDefaults(
 )
 
 defineEmits<{ refresh: [] }>()
-useGettext()
 </script>

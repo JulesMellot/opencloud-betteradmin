@@ -5,6 +5,7 @@
       <span class="ext:text-role-on-surface-variant" v-text="percentageLabel" />
     </div>
     <oc-progress
+      v-if="quota"
       :value="percentage"
       :max="100"
       size="small"
@@ -26,7 +27,10 @@ const percentage = computed(() => {
   if (!props.quota?.total || props.quota.total <= 0) return 0
   return Math.min(100, Math.round(((props.quota.used || 0) / props.quota.total) * 100))
 })
-const percentageLabel = computed(() => (props.quota?.total === 0 ? '∞' : `${percentage.value}%`))
+const percentageLabel = computed(() => {
+  if (!props.quota) return '—'
+  return props.quota.total === 0 ? '∞' : `${percentage.value}%`
+})
 const progressColor = computed(() =>
   props.quota?.state === 'normal' ? 'var(--oc-role-secondary)' : 'var(--oc-role-error)'
 )
