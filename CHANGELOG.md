@@ -2,6 +2,13 @@
 
 All notable changes to BetterAdmin are documented in this file.
 
+## 0.1.2 - 2026-09-22
+
+### Fixed
+
+- Render custom user and space table cells by declaring their `OcTable` fields as slots.
+- Restore avatars, quota bars, storage values, remaining capacity, and status indicators in production.
+
 ## 0.1.1 - 2026-09-22
 
 ### Fixed

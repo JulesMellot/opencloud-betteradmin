@@ -104,12 +104,24 @@ const sortBy = ref('used')
 const sortDir = ref<SortDir>(SortDir.Desc)
 
 const fields = computed<FieldType[]>(() => [
-  { name: 'icon', title: '', headerType: 'slot', width: 'shrink' },
-  { name: 'name', title: $gettext('Space'), width: 'expand', sortable: true },
-  { name: 'usage', title: $gettext('Quota usage'), width: 'expand' },
-  { name: 'used', title: $gettext('Used'), width: 'shrink', sortable: true },
-  { name: 'remaining', title: $gettext('Remaining'), width: 'shrink', sortable: true },
-  { name: 'total', title: $gettext('Total quota'), width: 'shrink', sortable: true }
+  { name: 'icon', title: '', type: 'slot', headerType: 'slot', width: 'shrink' },
+  { name: 'name', title: $gettext('Space'), type: 'slot', width: 'expand', sortable: true },
+  { name: 'usage', title: $gettext('Quota usage'), type: 'slot', width: 'expand' },
+  { name: 'used', title: $gettext('Used'), type: 'slot', width: 'shrink', sortable: true },
+  {
+    name: 'remaining',
+    title: $gettext('Remaining'),
+    type: 'slot',
+    width: 'shrink',
+    sortable: true
+  },
+  {
+    name: 'total',
+    title: $gettext('Total quota'),
+    type: 'slot',
+    width: 'shrink',
+    sortable: true
+  }
 ])
 
 const filteredSpaces = computed(() => {

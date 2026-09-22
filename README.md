@@ -47,7 +47,7 @@ BetterAdmin 0.1.x targets OpenCloud Web 8.x.
 
 ### Install from a release
 
-1. Download `web-app-betteradmin-v0.1.1.zip` from the latest GitHub release.
+1. Download `web-app-betteradmin-v0.1.2.zip` from the latest GitHub release.
 2. Create a `betteradmin` directory in the OpenCloud web apps directory.
 3. Extract the archive into that directory. `manifest.json` must be directly inside the
    `betteradmin` directory, not inside an additional nested folder.
