@@ -2,6 +2,14 @@
 
 All notable changes to BetterAdmin are documented in this file.
 
+## 0.1.3 - 2026-09-22
+
+### Fixed
+
+- Display unrestricted remaining capacity as `Unrestricted` instead of OpenCloud's maximum-integer sentinel value.
+- Avoid duplicate infinity and missing-quota markers next to adjacent table columns.
+- Display missing personal-drive usage as unavailable instead of zero bytes.
+
 ## 0.1.2 - 2026-09-22
 
 ### Fixed

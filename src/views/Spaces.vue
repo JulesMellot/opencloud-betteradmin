@@ -61,7 +61,7 @@
           />
         </template>
         <template #used="{ item }">{{ formatBytes(item.spaceQuota?.used || 0) }}</template>
-        <template #remaining="{ item }">{{ formatRemaining(item.spaceQuota?.remaining) }}</template>
+        <template #remaining="{ item }">{{ formatRemaining(item.spaceQuota) }}</template>
         <template #total="{ item }">{{ formatTotal(item.spaceQuota?.total) }}</template>
         <template #footer>
           <pagination :pages="totalPages" :current-page="currentPage" />
@@ -86,6 +86,7 @@ import {
 } from '@opencloud-eu/web-pkg'
 import { OcIcon, OcSearchBar, OcTable } from '@opencloud-eu/design-system/components'
 import { FieldType, SortDir } from '@opencloud-eu/design-system/helpers'
+import { Quota } from '@opencloud-eu/web-client/graph/generated'
 import { computed, onMounted, ref, unref, watch } from 'vue'
 import { useGettext } from 'vue3-gettext'
 import AppLayout from '../components/AppLayout.vue'
@@ -142,8 +143,10 @@ const spacesTotalLabel = computed(() =>
 const formatBytes = (bytes: number) => formatFileSize(bytes, currentLanguage)
 const formatTotal = (total?: number) =>
   total === 0 ? $gettext('Unrestricted') : total ? formatBytes(total) : '—'
-const formatRemaining = (remaining?: number) =>
-  typeof remaining === 'number' ? formatBytes(remaining) : '—'
+const formatRemaining = (quota?: Quota) => {
+  if (quota?.total === 0) return $gettext('Unrestricted')
+  return typeof quota?.remaining === 'number' ? formatBytes(quota.remaining) : '—'
+}
 const formatUsage = (used?: number, total?: number) =>
   `${formatBytes(used || 0)} / ${formatTotal(total)}`
 

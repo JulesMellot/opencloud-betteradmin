@@ -64,7 +64,7 @@
             :label="formatUsage(item.drive?.quota?.used, item.drive?.quota?.total)"
           />
         </template>
-        <template #used="{ item }">{{ formatBytes(item.drive?.quota?.used || 0) }}</template>
+        <template #used="{ item }">{{ formatUsed(item.drive?.quota?.used) }}</template>
         <template #total="{ item }">{{ formatTotal(item.drive?.quota?.total) }}</template>
         <template #status="{ item }">
           <span class="ext:inline-flex ext:items-center ext:gap-2">
@@ -153,8 +153,9 @@ const usersTotalLabel = computed(() =>
 const formatBytes = (bytes: number) => formatFileSize(bytes, currentLanguage)
 const formatTotal = (total?: number) =>
   total === 0 ? $gettext('Unrestricted') : total ? formatBytes(total) : '—'
+const formatUsed = (used?: number) => (typeof used === 'number' ? formatBytes(used) : '—')
 const formatUsage = (used?: number, total?: number) =>
-  `${formatBytes(used || 0)} / ${formatTotal(total)}`
+  typeof used === 'number' ? `${formatBytes(used)} / ${formatTotal(total)}` : '—'
 
 type QuotaStatus = 'missing' | 'normal' | 'nearing' | 'critical' | 'exceeded'
 

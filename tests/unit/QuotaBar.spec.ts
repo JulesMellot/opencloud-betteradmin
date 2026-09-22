@@ -7,7 +7,7 @@ describe('QuotaBar', () => {
     const wrapper = shallowMount(QuotaBar, { props: { label: 'Not initialized' } })
 
     expect(wrapper.findComponent(OcProgress).exists()).toBe(false)
-    expect(wrapper.text()).toContain('—')
+    expect(wrapper.text()).toBe('Not initialized')
   })
 
   it('uses the OpenCloud quota state for the progress color', () => {
@@ -16,5 +16,14 @@ describe('QuotaBar', () => {
     })
 
     expect(wrapper.findComponent(OcProgress).props('color')).toBe('var(--oc-role-secondary)')
+  })
+
+  it('does not render a percentage or progress bar for an unrestricted quota', () => {
+    const wrapper = shallowMount(QuotaBar, {
+      props: { label: '4.3 GB / Unrestricted', quota: { used: 4_300, total: 0 } }
+    })
+
+    expect(wrapper.findComponent(OcProgress).exists()).toBe(false)
+    expect(wrapper.text()).toBe('4.3 GB / Unrestricted')
   })
 })
